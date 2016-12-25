@@ -31,5 +31,6 @@ public class Minesweeper {
         placedMines+=1;
       }
     }
+    return res;
   }
 }
