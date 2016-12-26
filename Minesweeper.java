@@ -4,9 +4,8 @@ public class Minesweeper {
     Scanner s = new Scanner(System.in);//REMEMBER THIS IS THE INITIALIZED SCANNER!!!
     System.out.println("How many rows/columns?");
     int inp = s.nextInt();//for all inputs, non-menu
-    String[][][] layers = new String[2][inp][inp];//this is the extra cred part
-    //if i get lazy, which is likely, fuck the extra cred, sryyy
-    //making a gui is just complicated and annoying
+    String[][][] layers = new String[2][inp][inp];//3D would be the extra cred part
+    //Possible gui in the future
     System.out.println("Select the number next to the difficulty you want\n1. Easy\n2. Medium\n3. Hard\nOther inputs will 'Quit'");
     int menuInp = s.nextInt();//if 1, put 15% mines, if 2 => 20%, if 3 => 25%, else quit loop
     layers = setUpMinesweeper(inp, menuInp); //takes difficulty, makes mines, uses rows/cols to make the final result
