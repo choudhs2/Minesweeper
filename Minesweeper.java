@@ -1,9 +1,9 @@
 import java.util.Scanner;
 
 public class Minesweeper {
-  
+  public static Scanner s = new Scanner(System.in);//REMEMBER THIS IS THE INITIALIZED SCANNER!!!
   public static void main(String[] args) {
-    Scanner s = new Scanner(System.in);//REMEMBER THIS IS THE INITIALIZED SCANNER!!!
+    //Scanner s = new Scanner(System.in);//REMEMBER THIS IS THE INITIALIZED SCANNER!!!
     System.out.println("How many rows/columns? (enter one number, it is a square grid)");
     int inp = s.nextInt();//for all inputs, non-menu
     String[][][] layers = new String[2][inp][inp];//3D would be the extra cred part
@@ -16,33 +16,39 @@ public class Minesweeper {
       boolean check = true; //while this is true, it will run, so we can change this instead of using break (simplicity reasons)
       String menuInput = "";//to avoid errors with non-int inputs
       int[] coords = new int[2];//will store the coordinates
+      boolean b = false;//use for completion cheeck
       while (check) {
         printMinefield(layers);
+        b = completionCheck(layers);
+        if (b) {
+          System.out.println("YOU WIN!!!");
+          break;
+        }
         System.out.println("What will you do?\n1. Flag\n2. Unflag\n3. Choose a place to step\nAnything else will quit the game");
         menuInput = s.next();//main menu that asks if it should flag/unflag, click, or quit game
         if (menuInput.equals("1")) {
-          coords = inpCoords(s);//sends scnner in, gets 2 coords out
+          coords = inpCoords(inp);//sends scnner in, gets 2 coords out
           if (!(layers[0][coords[0]][coords[1]].equals("SHOW"))) {//if it isnt shown
             layers[0][coords[0]][coords[1]] = "F";//flagged
           }
         }
         else if (menuInput.equals("2")) {
-          coords = inpCoords(s);//sends scnner in, gets 2 coords out
+          coords = inpCoords(inp);//sends scnner in, gets 2 coords out
           if (!(layers[0][coords[0]][coords[1]].equals("SHOW"))) {//if it isnt shown
             layers[0][coords[0]][coords[1]] = " ";//unflagged
           }
         }
         else if (menuInput.equals("3")) {
-          coords = inpCoords(s);//sends scnner in, gets 2 coords out
+          coords = inpCoords(inp);//sends scnner in, gets 2 coords out
           if (layers[1][coords[0]][coords[1]].equals("X")) {
             loss(layers);
             check=false;
           }
-          else if (!(layers[0][coords[0]][coords[1]].equals("SHOW")) && !(layers[1][coords[0]][coords[1]].equals("0"))) {
+          else if (!(layers[0][coords[0]][coords[1]].equals("SHOW"))/* && !(layers[1][coords[0]][coords[1]].equals("0"))*/) {
             layers[0][coords[0]][coords[1]] = "SHOW";
           }
           else if (!(layers[0][coords[0]][coords[1]].equals("SHOW"))) {
-            layers = showZeroes(layers, coords);
+            layers = showZeroes(layers, coords);//will not happen now
           } 
         }
         else {
@@ -54,11 +60,102 @@ public class Minesweeper {
     }
   }
   
+  public static boolean completionCheck(String[][][] l) {
+    for (int i = 0; i <l[0].length; i++) {
+      for (int j = 0; j <l[0][0].length; j++) {
+        if (!(l[0][i][j].equals("F") || l[0][i][j].equals("SHOW"))) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  
   public static String[][][] showZeroes(String[][][] l, int[] c) {//does not work yet     DOES NOT WORK YET
-    if (c[0] > 0 && c[0] < l[1].length && c[1] > 0 && c[1] < l[1][0].length) {
-      l[0][c[0]][c[1]] = "SHOW";
+    l[0][c[0]][c[1]] = "SHOW";
+    if (c[0] > 0 && c[0] < l[1].length-1 && c[1] > 0 && c[1] < l[1][0].length-1) {
       for (int i = c[0]-1; i < c[0]+2; i++) {
         for (int j = c[1]-1; j < c[1]+2; j++) {
+          int[] a = {i, j};
+          if (l[1][i][j].equals("0") && i!=c[0] && j!=c[1]) {
+            l = showZeroes(l, a);
+          }
+        }
+      }
+    }
+    else if (c[0] == 0 && c[1] > 0 && c[1] < l[0][0].length-1) {
+      for (int i = c[0]; i < c[0]+2; i++) {
+        for (int j = c[1]-1; j < c[1]+2; j++) {
+          int[] a = {i, j};
+          if (l[1][i][j].equals("0") && i!=c[0] && j!=c[1]) {
+            l = showZeroes(l, a);
+          }
+        }
+      }
+    }
+    else if (c[1] == 0 && c[0] > 0 && c[0] < l[0].length-1) {
+      for (int i = c[0]-1; i < c[0]+2; i++) {
+        for (int j = c[1]; j < c[1]+2; j++) {
+          int[] a = {i, j};
+          if (l[1][i][j].equals("0") && i!=c[0] && j!=c[1]) {
+            l = showZeroes(l, a);
+          }
+        }
+      }
+    }
+    else if (c[0] == l[0].length-1 && c[1] > 0 && c[1] < l[0][0].length-1) {
+      for (int i = c[0]-1; i < c[0]+1; i++) {
+        for (int j = c[1]-1; j < c[1]+2; j++) {
+          int[] a = {i, j};
+          if (l[1][i][j].equals("0") && i!=c[0] && j!=c[1]) {
+            l = showZeroes(l, a);
+          }
+        }
+      }
+    }
+    else if (c[1] == l[0][0].length-1 && c[0] > 0 && c[0] < l[0].length-1) {
+      for (int i = c[0]-1; i < c[0]+2; i++) {
+        for (int j = c[1]-1; j < c[1]+1; j++) {
+          int[] a = {i, j};
+          if (l[1][i][j].equals("0") && i!=c[0] && j!=c[1]) {
+            l = showZeroes(l, a);
+          }
+        }
+      }
+    }
+    else if (c[0] == 0 && c[1] == 0) {
+      for (int i = c[0]; i < c[0]+2; i++) {
+        for (int j = c[1]; j < c[1]+2; j++) {
+          int[] a = {i, j};
+          if (l[1][i][j].equals("0") && i!=c[0] && j!=c[1]) {
+            l = showZeroes(l, a);
+          }
+        }
+      }
+    }
+    else if (c[0] == l[0].length-1 && c[1] == 0) {
+      for (int i = c[0]-1; i < c[0]+1; i++) {
+        for (int j = c[1]; j < c[1]+2; j++) {
+          int[] a = {i, j};
+          if (l[1][i][j].equals("0") && i!=c[0] && j!=c[1]) {
+            l = showZeroes(l, a);
+          }
+        }
+      }
+    }
+    else if (c[0] == 0 && c[1] == l[0][0].length-1) {
+      for (int i = c[0]; i < c[0]+2; i++) {
+        for (int j = c[1]-1; j < c[1]+1; j++) {
+          int[] a = {i, j};
+          if (l[1][i][j].equals("0") && i!=c[0] && j!=c[1]) {
+            l = showZeroes(l, a);
+          }
+        }
+      }
+    }
+    else if (c[0] == l[0].length-1 && c[1] == l[0][0].length-1) {
+      for (int i = c[0]-1; i < c[0]+1; i++) {
+        for (int j = c[1]-1; j < c[1]+1; j++) {
           int[] a = {i, j};
           if (l[1][i][j].equals("0") && i!=c[0] && j!=c[1]) {
             l = showZeroes(l, a);
@@ -161,9 +258,12 @@ public class Minesweeper {
     return l;//i hate everything
   }
   
-  public static int[] inpCoords(Scanner s) {
+  public static int[] inpCoords(int inp) {
     System.out.println("Enter row number (0 to number of rows/columns you chose-1) then the column (same rule)");
     int[] n = {s.nextInt(), s.nextInt()};
+    if (n[0] < 0 || n[0] > inp-1 || n[1] < 0 || n[1] > inp-1) {
+      n = inpCoords(inp);
+    }
     return n;
   }
   
