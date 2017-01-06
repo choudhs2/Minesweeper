@@ -47,9 +47,6 @@ public class Minesweeper {
           else if (!(layers[0][coords[0]][coords[1]].equals("SHOW"))/* && !(layers[1][coords[0]][coords[1]].equals("0"))*/) {
             layers[0][coords[0]][coords[1]] = "SHOW";
           }
-          else if (!(layers[0][coords[0]][coords[1]].equals("SHOW"))) {
-            layers = showZeroes(layers, coords);//will not happen now
-          } 
         }
         else {
           System.out.println("you quit");
@@ -71,42 +68,19 @@ public class Minesweeper {
     return true;
   }
   
-  public static String[][][] showZeroes(String[][][] l, int[] c) {//does not work yet     DOES NOT WORK YET
-    l[0][c[0]][c[1]] = "SHOW";
-    if (c[0] > 0 && c[0] < l[1].length-1 && c[1] > 0 && c[1] < l[1][0].length-1) {
-      /*for (int i = c[0]-1; i < c[0]+2; i++) {
-        for (int j = c[1]-1; j < c[1]+2; j++) {
-          int[] a = {i, j};
-          if (l[1][i][j].equals("0") && i!=c[0] && j!=c[1]) {
-            l = showZeroes(l, a);
-          }
-        }
-      }*/
-      int[] a = {c[0]-1, c[1]-1};
-      l=showZeroes(l, a);
-      int[] b = {c[0]-1, c[1]+1};
-      l=showZeroes(l, b);
-      int[] g = {c[0]+1, c[1]-1};
-      l=showZeroes(l, g);
-      int[] d = {c[0]+1, c[1]+1};
-      l=showZeroes(l, d);
-    }
-  return l;
-  }
-  
-  public static String[][][] setUpNumbers(String[][][] l) {//make more efficient
-    for (int i = 1; i < l[1].length-1; i++) {//mid
+  public static String[][][] setUpNumbers(String[][][] l) {
+    for (int i = 1; i < l[1].length-1; i++) {
       for (int z = 1; z < l[1][1].length-1; z++) {
         if (!(l[1][i][z].equals("X"))) {
           int count = 0;
-          for (int j = i-1; j < i+2; j++) {
-            for (int k = z-1; k <z+2; k++) {
-              if (!(k==z && j==i) && (l[1][j][k].equals("X"))) {
+          for (int j = i-1; j < i+2; j++) { //checks rows above, below, and on the same row
+            for (int k = z-1; k <z+2; k++) { //checks the columns next to it and the same col
+              if (!(k==z && j==i) && (l[1][j][k].equals("X"))) { 
                 count += 1;
               }
             }
           }
-          l[1][i][z] = "" + count;
+          l[1][i][z] = "" + count; //where we put the numbers
         }
       }
     }
