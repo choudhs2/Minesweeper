@@ -41,11 +41,15 @@ public class Minesweeper {
         else if (menuInput.equals("3")) {
           coords = inpCoords(inp);//sends scnner in, gets 2 coords out
           if (layers[1][coords[0]][coords[1]].equals("X")) {
+            System.out.println("You lose :(");
             loss(layers);
             check=false;
           }
-          else if (!(layers[0][coords[0]][coords[1]].equals("SHOW"))/* && !(layers[1][coords[0]][coords[1]].equals("0"))*/) {
+          else if (!(layers[0][coords[0]][coords[1]].equals("SHOW")) && !(layers[1][coords[0]][coords[1]].equals("0"))) {
             layers[0][coords[0]][coords[1]] = "SHOW";
+          }
+          else if (!(layers[0][coords[0]][coords[1]].equals("SHOW"))) {
+            layers = showZeroes(layers, coords);
           }
         }
         else {
@@ -55,6 +59,74 @@ public class Minesweeper {
         }
       }
     }
+  }
+  
+  public static String[][][] showZeroes(String[][][] l, int[] c) {
+    int[] howFar = new int[2];//how far up it goes, then down
+    for (int i = 0, count = 0; i < 2; i++) {
+      for (int j = 1; j < l[0].length-2; j++) {
+        if ((i == 0 && l[1][c[0]-j][c[1]].equals("0")) || (i == 2 && l[1][c[0]+j][c[1]].equals("0"))) {
+          //if  it is any combo of these cases, otherwise break
+          count++;
+        }
+        else {
+          break;//leave the loop when it hits a number
+        }
+      }
+      howFar[i] = count;
+    }
+    int[][] leftAndRight = new int[howFar[0] + howFar[1] + 1][2];//for each row how far
+    for (int i = 0; i < howFar.length; i++) {
+      for (int j = howFar[i]; j >= 0; j--) {//how much above and below
+        boolean check1 = true;
+        int left = 1;
+        while (check1) {
+          if (l[1][c[0]-j][c[1]-left].equals("0")) {
+            left++;
+          }
+          else {
+            check1= false;
+          }
+        }
+        boolean check2 = true;
+        int right = 1;
+        while (check2) {
+          if (l[1][c[0]-j][c[1]+right].equals("0")) {
+            right++;
+          }
+          else {
+            check1= false;
+          }
+        }
+        if (i == 0) {
+          leftAndRight[howFar[0]-j][0] = left;
+          leftAndRight[howFar[0]-j][1] = right;
+        }
+        else {
+          leftAndRight[leftAndRight.length - (howFar[0]-j) - 1][0] = left;
+          leftAndRight[leftAndRight.length - (howFar[0]-j) - 1][1] = right;
+        }
+      }
+    }
+    for (int i = 0; i < howFar[0] + howFar[1] +1;  i++) {
+      for (int j = leftAndRight[i][0] + 1; j > 0; j--) {
+        if (i < howFar[0]) {
+          l[0][c[0]-i][c[1]-j] = "SHOW";
+        }
+        else {
+          l[0][c[0]+i][c[1]-j] = "SHOW";
+        }
+      }
+      for (int j = leftAndRight[i][1]; j > 0; j--) {
+        if (i < howFar[0]) {
+          l[0][c[0]-i][c[1]+j] = "SHOW";
+        }
+        else {
+          l[0][c[0]+i][c[1]+j] = "SHOW";
+        }
+      }
+    }
+    return l;
   }
   
   public static boolean completionCheck(String[][][] l) {
